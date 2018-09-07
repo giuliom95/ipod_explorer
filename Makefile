@@ -3,9 +3,9 @@ CC=gcc
 CFLAGS=-Wall
 TARGET=bin/ipod
 
-INCLUDES=-I/usr/include/gpod-1.0/gpod -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include
+INCLUDES=-I/usr/include/gpod-1.0/gpod `pkg-config --cflags glib-2.0`
 
-LDFLAGS=-lgpod -lglib-2.0
+LDFLAGS=-lgpod `pkg-config --libs glib-2.0`
 
 # globs
 SRCS := $(wildcard src/*.c)
