@@ -3,15 +3,26 @@
 #include <stdio.h>
 #include <string.h>
 #include <itdb.h>
+#include <time.h>
+#include <stdlib.h>
 
-int sort_by_name (const void* a, const void* b) {
+int shuffle_cmpfn(const void* a, const void* b) {
 	const Itdb_Track* track_a = (Itdb_Track*)a;
 	const Itdb_Track* track_b = (Itdb_Track*)b;
 
-	return strcmp(track_a->title, track_b->title);
+	return track_a->unk132 - track_b->unk132;
+}
+
+GList* shuffle(GList* tracks) {
+	for(GList* l = tracks; l != NULL; l = l->next) {
+		Itdb_Track* track = (Itdb_Track*)(l->data);
+		track->unk132 = (guint32)rand();
+	}
+	return g_list_sort(tracks, &shuffle_cmpfn);
 }
 
 int main(int argc, char** argv) {
+	srand(time(NULL));
 	printf("Hello iPod!\n");
 	if(argc == 1) {
 		fprintf(stderr, "ERROR: Please specify iPod mounting path.\n");
@@ -31,7 +42,7 @@ int main(int argc, char** argv) {
 			*last = '\0';
 	}
 
-	GList* l = g_list_sort(db->tracks, &sort_by_name);
+	GList* l = shuffle(db->tracks);
 	for(; l != NULL; l = l->next) {
 		Itdb_Track* track = (Itdb_Track*)(l->data);
 		char* track_path = track->ipod_path;
