@@ -4,16 +4,21 @@
 
 #include <itdb.h>
 
-int main() {
+int main(int argc, char** argv) {
 	printf("Hello iPod!\n");
-	GError *error;
+	if(argc == 1) {
+		fprintf(stderr, "ERROR: Please specify iPod mounting path.\n");
+		return -1;
+	}
+
+	char* ipod_path = argv[1];
+	GError *error = NULL;
 
 	printf("Fetching data..."); fflush(stdout);
-	Itdb_iTunesDB* db = itdb_parse("/run/media/giulio/IOLD", &error);	
+	Itdb_iTunesDB* db = itdb_parse(ipod_path, &error);	
 	printf("DONE");
 
 	int track_number = g_list_length(db->tracks);
-
 	printf("Number of tracks: %d\n", track_number);
 
 	for(GList* l = db->tracks; l != NULL; l = l->next) {
