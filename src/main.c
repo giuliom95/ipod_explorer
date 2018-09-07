@@ -4,7 +4,7 @@
 #include <string.h>
 #include <itdb.h>
 
-int compare_fn (const void* a, const void* b) {
+int sort_by_name (const void* a, const void* b) {
 	const Itdb_Track* track_a = (Itdb_Track*)a;
 	const Itdb_Track* track_b = (Itdb_Track*)b;
 
@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 			*last = '\0';
 	}
 
-	GList* l = g_list_sort(db->tracks, &compare_fn);
+	GList* l = g_list_sort(db->tracks, &sort_by_name);
 	for(; l != NULL; l = l->next) {
 		Itdb_Track* track = (Itdb_Track*)(l->data);
 		char* track_path = track->ipod_path;
