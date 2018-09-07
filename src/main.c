@@ -4,6 +4,13 @@
 #include <string.h>
 #include <itdb.h>
 
+int compare_fn (const void* a, const void* b) {
+	const Itdb_Track* track_a = (Itdb_Track*)a;
+	const Itdb_Track* track_b = (Itdb_Track*)b;
+
+	return strcmp(track_a->title, track_b->title);
+}
+
 int main(int argc, char** argv) {
 	printf("Hello iPod!\n");
 	if(argc == 1) {
@@ -24,19 +31,22 @@ int main(int argc, char** argv) {
 			*last = '\0';
 	}
 
-	for(GList* l = db->tracks; l != NULL; l = l->next) {
+	GList* l = g_list_sort(db->tracks, &compare_fn);
+	for(; l != NULL; l = l->next) {
 		Itdb_Track* track = (Itdb_Track*)(l->data);
 		char* track_path = track->ipod_path;
 
 		fprintf(stdout, "%s", ipod_path);
-		for(char* c = track_path; *c != '\0'; ++c)
+		for(char* c = track_path; *c != '\0'; ++c) {
 			if(*c == ':') 
 				fputc('/', stdout);
-			else if(*c == ' ') {
-				fputc('\\', stdout);
-				fputc(' ', stdout);
-			} else
+			else {
+				if(*c == ' ' || *c == '(' || *c == ')') 
+					fputc('\\', stdout);
+
 				fputc(*c, stdout);
+			}
+		}
 		fputc('\n', stdout);
 	}
 
