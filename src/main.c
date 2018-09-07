@@ -1,7 +1,7 @@
 // gcc -I/usr/include/gpod-1.0/gpod -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include -lgpod -lglib-2.0 -Wall src/main.c -o bin/ipod
 
 #include <stdio.h>
-
+#include <string.h>
 #include <itdb.h>
 
 int main(int argc, char** argv) {
@@ -16,14 +16,28 @@ int main(int argc, char** argv) {
 
 	printf("Fetching data..."); fflush(stdout);
 	Itdb_iTunesDB* db = itdb_parse(ipod_path, &error);	
-	printf("DONE");
+	printf("DONE\n");
 
-	int track_number = g_list_length(db->tracks);
-	printf("Number of tracks: %d\n", track_number);
+	{
+		char* last = strrchr(ipod_path, '/');
+		if(*(last + sizeof(char)) == '\0')
+			*last = '\0';
+	}
 
 	for(GList* l = db->tracks; l != NULL; l = l->next) {
 		Itdb_Track* track = (Itdb_Track*)(l->data);
-		printf("%s %s\n", track->title, track->ipod_path);
+		char* track_path = track->ipod_path;
+
+		fprintf(stdout, "%s", ipod_path);
+		for(char* c = track_path; *c != '\0'; ++c)
+			if(*c == ':') 
+				fputc('/', stdout);
+			else if(*c == ' ') {
+				fputc('\\', stdout);
+				fputc(' ', stdout);
+			} else
+				fputc(*c, stdout);
+		fputc('\n', stdout);
 	}
 
 	return 0;
